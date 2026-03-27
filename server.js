@@ -1,5 +1,6 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { version } from "os";
 import { z } from "zod";
 
 // Create an MCP server
@@ -8,13 +9,35 @@ const server = new McpServer({
   version: "1.0.0"
 });
 
-// Add an addition tool
+
+
+// Tool function
+async function getMyCaleraDataByDate(date){
+    const calender=google.calender({
+        version:"v3",
+        auth: process.env.GOOGLE_CALENDER_API_KEY
+    })
+}
+
+
+
+// Register  an addition tool
 server.tool(
     "getMyCalendarDataByDate",
     {
         date: z.string().refine((val)=>!isNaN(Date.parse(val)),{
             message: "Invalid date format. Please provide a valid date string."
-        })
+        }),
+    },
+    async({date})=>{
+        return {
+            content: [
+                {
+                    type:"text",
+                    text: JSON.stringify(await getMyCaleraDataByDate(date)),
+                }
+            ]
+        }
     }
 )
 
